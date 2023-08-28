@@ -331,3 +331,15 @@ type Vault @entity {
   "name assigned when vault is set"
   name: String!
 }
+
+type OldToken @entity {
+  id: ID!
+  holders: [String!]!
+  balances: [OldTokenBalance!]!
+}
+
+type OldTokenBalance @entity {
+  id: ID!
+  holder: Bytes!
+  balance: BigInt!
+}

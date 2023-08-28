@@ -9,10 +9,17 @@ import {
   LootTemplate,
   SharesTemplate,
 } from '../generated/templates';
-import { Dao, TokenLookup, Vault } from '../generated/schema';
+import {
+  Dao,
+  OldToken,
+  OldTokenBalance,
+  TokenLookup,
+  Vault,
+} from '../generated/schema';
 import { constants } from './util/constants';
 import { Address } from '@graphprotocol/graph-ts';
 import { getErc20Name, getErc20Symbol } from './util/general';
+import { mintShares, mintLoot } from './old-token-mapping';
 
 export function handleSummonBaalV2(event: SummonBaalV2): void {
   BaalTemplate.create(event.params.baal);
@@ -92,6 +99,40 @@ export function handleSummonBaalV2(event: SummonBaalV2): void {
   lootTokenLookup.dao = event.params.baal;
 
   lootTokenLookup.save();
+
+  const oldShareToken = OldToken.load(event.params.shares.toHexString());
+
+  if (oldShareToken != null) {
+    for (let i = 0; i < oldShareToken.holders.length; i++) {
+      const holder = oldShareToken.holders[i];
+      const holderId = oldShareToken.id.concat('-holder-').concat(holder);
+      const oldTokenBalance = OldTokenBalance.load(holderId);
+      if (oldTokenBalance != null) {
+        const memberId = dao.id.concat('-member-').concat(holder);
+        const balance = oldTokenBalance.balance;
+        const timestamp = event.block.timestamp;
+        const memberAddress = Address.fromString(holder);
+        mintShares(dao, memberId, balance, timestamp, memberAddress);
+      }
+    }
+  }
+
+  const oldLootToken = OldToken.load(event.params.loot.toHexString());
+
+  if (oldLootToken != null) {
+    for (let i = 0; i < oldLootToken.holders.length; i++) {
+      const holder = oldLootToken.holders[i];
+      const holderId = oldLootToken.id.concat('-holder-').concat(holder);
+      const oldTokenBalance = OldTokenBalance.load(holderId);
+      if (oldTokenBalance != null) {
+        const memberId = dao.id.concat('-member-').concat(holder);
+        const balance = oldTokenBalance.balance;
+        const timestamp = event.block.timestamp;
+        const memberAddress = Address.fromString(holder);
+        mintLoot(dao, memberId, balance, timestamp, memberAddress);
+      }
+    }
+  }
 }
 
 export function handleSummonBaal(event: SummonBaal): void {
@@ -167,6 +208,40 @@ export function handleSummonBaal(event: SummonBaal): void {
   lootTokenLookup.dao = event.params.baal;
 
   lootTokenLookup.save();
+
+  const oldShareToken = OldToken.load(event.params.shares.toHexString());
+
+  if (oldShareToken != null) {
+    for (let i = 0; i < oldShareToken.holders.length; i++) {
+      const holder = oldShareToken.holders[i];
+      const holderId = oldShareToken.id.concat('-holder-').concat(holder);
+      const oldTokenBalance = OldTokenBalance.load(holderId);
+      if (oldTokenBalance != null) {
+        const memberId = dao.id.concat('-member-').concat(holder);
+        const balance = oldTokenBalance.balance;
+        const timestamp = event.block.timestamp;
+        const memberAddress = Address.fromString(holder);
+        mintShares(dao, memberId, balance, timestamp, memberAddress);
+      }
+    }
+  }
+
+  const oldLootToken = OldToken.load(event.params.loot.toHexString());
+
+  if (oldLootToken != null) {
+    for (let i = 0; i < oldLootToken.holders.length; i++) {
+      const holder = oldLootToken.holders[i];
+      const holderId = oldLootToken.id.concat('-holder-').concat(holder);
+      const oldTokenBalance = OldTokenBalance.load(holderId);
+      if (oldTokenBalance != null) {
+        const memberId = dao.id.concat('-member-').concat(holder);
+        const balance = oldTokenBalance.balance;
+        const timestamp = event.block.timestamp;
+        const memberAddress = Address.fromString(holder);
+        mintLoot(dao, memberId, balance, timestamp, memberAddress);
+      }
+    }
+  }
 }
 
 export function handleDaoReferral(event: DaoReferral): void {
